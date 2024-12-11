@@ -1,5 +1,7 @@
-### go-christmas
+# go-christmas
 
-![Christmas Tree](screenshot.png)
+Just run `go run main.go christmastree.go` and will see the animated Christmas tree decorated by snowflakes.
 
-Run executable binary on [macOS (arm64)](./bin/mac_arm), [Windows (x64)](./bin/windows_x64.exe) or [Linux (amd64)](./bin/linux_x64) or just by `go run main.go`
+![Christmas tree](screenshot.png)
+
+Run executable binary for [macOS (arm64)](./bin/mac_arm), [Windows (x64)](./bin/windows_x64.exe) or [Linux (amd64)](./bin/linux_x64)
