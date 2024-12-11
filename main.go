@@ -2,18 +2,15 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
+	"log"
 	"os"
 	"os/exec"
 	"os/signal"
 	"runtime"
+	"strconv"
+	"strings"
 	"syscall"
 	"time"
-)
-
-const (
-	ledgeBranchCount = 3
-	treeHeight       = 6
 )
 
 var clearMap map[string]func()
@@ -34,21 +31,29 @@ func init() {
 		cmd.Stdout = os.Stdout
 		_ = cmd.Run()
 	}
+
+	_, ok := clearMap[runtime.GOOS]
+	if !ok {
+		log.Fatalf("OS %s does not support!", runtime.GOOS)
+	}
 }
 
 func main() {
-	c := make(chan os.Signal)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	ch := make(chan os.Signal)
+	signal.Notify(ch, os.Interrupt, syscall.SIGTERM)
 
 	go func() {
-		<-c
+		<-ch
 
-		fmt.Println("\nBye bye... Merry Christmas and Happy New Year!")
-		os.Exit(1)
+		fmt.Println("\nBye bye... Have yourself a Merry Christmas and Happy New Year!")
+		os.Exit(0)
 	}()
 
+	tree := NewChristmasTree(getDimensions())
+	clearTerminal, _ := clearMap[runtime.GOOS]
+
 	for {
-		buildTree()
+		tree.Draw()
 
 		time.Sleep(1 * time.Second)
 
@@ -56,66 +61,40 @@ func main() {
 	}
 }
 
-func clearTerminal() {
-	clearExec, ok := clearMap[runtime.GOOS]
-	if ok {
-		clearExec()
-	} else {
-		panic("Platform is undefined!")
-	}
-}
-
-func buildTree() {
-	stem := ledgeBranchCount*treeHeight + ledgeBranchCount + 1
-	limit := ledgeBranchCount * treeHeight * 2
-
-	fmt.Println(buildLine(limit*2+ledgeBranchCount, randomSnow))
-	fmt.Printf("%s⭐️%s\n", buildLine(limit, randomSnow), buildLine(limit+1, randomSnow))
-
-	for i := 1; i < stem+1; i++ {
-		printLine(i, limit)
-
-		if 0 == i%3 {
-			printLine(i-1, limit)
-		}
+func getDimensions() (int, int) {
+	tputCols := exec.Command("tput", "cols")
+	tputCols.Stdin = os.Stdin
+	tputColsOut, err := tputCols.Output()
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	for i := 0; i < ledgeBranchCount-1; i++ {
-		fmt.Printf("%s🟤%s\n", buildLine(limit, randomSnow), buildLine(limit+2, randomSnow))
-	}
-}
-
-func putLeft(count int, limit int) string {
-	return buildLine(limit-count-1, randomSnow) + buildLine(count+1, randomGarland)
-}
-
-func putRight(count int, limit int) string {
-	return buildLine(count+1, randomGarland) + buildLine(limit-count+2, randomSnow)
-}
-
-func printLine(count int, limit int) {
-	fmt.Printf("%s🟤%s\n", putLeft(count, limit), putRight(count, limit))
-}
-
-func randomGarland() string {
-	random := [25]string{"🔴", "🟡", "🔵", "🟣", "🟠"}
-	for i := 5; i < 25; i++ {
-		random[i] = "🍀"
+	cols, err := strconv.Atoi(strings.TrimSuffix(string(tputColsOut), "\n"))
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	return random[rand.Intn(len(random))]
-}
-
-func randomSnow() string {
-	return [2]string{"❄️", " ️"}[rand.Intn(2)]
-}
-
-func buildLine(limit int, fn func() string) string {
-	line := ""
-
-	for i := 0; i < limit; i++ {
-		line += fn()
+	tputRows := exec.Command("tput", "lines")
+	tputRows.Stdin = os.Stdin
+	tputRowsOut, err := tputRows.Output()
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	return line
+	rows, err := strconv.Atoi(strings.TrimSuffix(string(tputRowsOut), "\n"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	remainder := cols % 2
+	if 0 != remainder {
+		cols -= remainder
+	}
+
+	remainder = rows % 10
+	if 0 != remainder {
+		rows -= remainder
+	}
+
+	return cols, rows
 }
