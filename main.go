@@ -87,12 +87,12 @@ func getDimensions() (int, int) {
 	}
 
 	remainder := cols % 2
-	if 0 != remainder {
+	if remainder != 0 {
 		cols -= remainder
 	}
 
 	remainder = rows % 10
-	if 0 != remainder {
+	if remainder != 0 {
 		rows -= remainder
 	}
 
