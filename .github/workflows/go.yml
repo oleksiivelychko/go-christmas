@@ -3,13 +3,13 @@ name: Build Go CLI
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    tags:
+      - "v*.*.*"
 
 jobs:
 
   build:
-    name: Build Go binaries
+    name: Release Go binaries
     runs-on: ubuntu-latest
 
     strategy:
@@ -26,7 +26,8 @@ jobs:
             ext: '.exe'
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
     - name: Set up Go
       uses: actions/setup-go@v4
@@ -45,3 +46,19 @@ jobs:
       with:
         name: go-christmas-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.ext }}
         path: dist/*
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v5
+        with:
+          path: dist
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
