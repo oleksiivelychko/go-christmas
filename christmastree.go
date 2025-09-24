@@ -36,11 +36,11 @@ func (t *ChristmasTree) randomSnow(garlandCount int) string {
 	snowflakes := cols - garlandCount - spaces
 
 	line := make([]string, snowflakes)
-	for i := 0; i < snowflakes; i++ {
+	for range snowflakes {
 		line = append(line, "❄️")
 	}
 
-	for i := 0; i < spaces; i++ {
+	for range spaces {
 		line = append(line, "  ")
 	}
 
@@ -59,7 +59,7 @@ func (t *ChristmasTree) randomGarland(count int) string {
 	)
 
 	ledge := make([]string, count)
-	for i := 0; i < count; i++ {
+	for range count {
 		ledge = append(ledge, garland[rand.Intn(len(garland))])
 	}
 
