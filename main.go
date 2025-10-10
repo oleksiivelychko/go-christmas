@@ -62,39 +62,46 @@ func main() {
 }
 
 func getDimensions() (int, int) {
-	tputCols := exec.Command("tput", "cols")
-	tputCols.Stdin = os.Stdin
-	tputColsOut, err := tputCols.Output()
+	cols, err := getTerminalCols()
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Warning: Could not get terminal columns: %v. Using default.", err)
+		cols = 80 // fallback default
 	}
 
-	cols, err := strconv.Atoi(strings.TrimSuffix(string(tputColsOut), "\n"))
+	rows, err := getTerminalRows()
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Warning: Could not get terminal rows: %v. Using default.", err)
+		rows = 24 // fallback default
 	}
 
-	tputRows := exec.Command("tput", "lines")
-	tputRows.Stdin = os.Stdin
-	tputRowsOut, err := tputRows.Output()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	rows, err := strconv.Atoi(strings.TrimSuffix(string(tputRowsOut), "\n"))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	remainder := cols % 2
-	if remainder != 0 {
+	// Normalize to even numbers
+	if remainder := cols % 2; remainder != 0 {
 		cols -= remainder
 	}
 
-	remainder = rows % 10
-	if remainder != 0 {
+	if remainder := rows % 10; remainder != 0 {
 		rows -= remainder
 	}
 
 	return cols, rows
+}
+
+func getTerminalCols() (int, error) {
+	cmd := exec.Command("tput", "cols")
+	cmd.Stdin = os.Stdin
+	output, err := cmd.Output()
+	if err != nil {
+		return 0, err
+	}
+	return strconv.Atoi(strings.TrimSpace(string(output)))
+}
+
+func getTerminalRows() (int, error) {
+	cmd := exec.Command("tput", "lines")
+	cmd.Stdin = os.Stdin
+	output, err := cmd.Output()
+	if err != nil {
+		return 0, err
+	}
+	return strconv.Atoi(strings.TrimSpace(string(output)))
 }
