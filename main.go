@@ -64,14 +64,14 @@ func main() {
 func getDimensions() (int, int) {
 	cols, err := getTerminalCols()
 	if err != nil {
-		log.Printf("Warning: Could not get terminal columns: %v. Using default.", err)
 		cols = 80 // fallback default
+		log.Printf("Warning: Could not get terminal columns: %v. Using default: %d.", err, cols)
 	}
 
 	rows, err := getTerminalRows()
 	if err != nil {
-		log.Printf("Warning: Could not get terminal rows: %v. Using default.", err)
 		rows = 24 // fallback default
+		log.Printf("Warning: Could not get terminal rows: %v. Using default: %d.", err, rows)
 	}
 
 	// Normalize to even numbers
