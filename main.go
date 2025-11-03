@@ -74,7 +74,7 @@ func getDimensions() (int, int) {
 		log.Printf("Warning: Could not get terminal rows: %v. Using default: %d.", err, rows)
 	}
 
-	// Normalize to even numbers
+	// normalize to even numbers
 	if remainder := cols % 2; remainder != 0 {
 		cols -= remainder
 	}
