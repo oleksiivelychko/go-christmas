@@ -45,7 +45,7 @@ func main() {
 	go func() {
 		<-ch
 
-		fmt.Println("\nBye bye... Have yourself a Merry Christmas and Happy New Year!")
+		fmt.Printf("\nBye bye... Have yourself a Merry Christmas and Happy New Year %d!", time.Now().Year()+1)
 		os.Exit(0)
 	}()
 
