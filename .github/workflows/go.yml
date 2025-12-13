@@ -27,12 +27,12 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Set up Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v6
       with:
-        go-version: '1.25.4'
+        go-version: '1.25.5'
         cache: false
 
     - name: Build
@@ -42,7 +42,7 @@ jobs:
           go build -o dist/go-christmas-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.ext }} ./
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: go-christmas-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.ext }}
         path: dist/*
@@ -54,7 +54,7 @@ jobs:
 
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           path: dist
 
